@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<base href="http://localhost:3000/">
+<head>
+    <meta charset="UTF-8" />
+    <title>Этикетка</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 98mm;
+            height: 80mm;
+            font-size: 7pt;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 2mm;
+            vertical-align: top;
+        }
+
+        p {
+            margin: 2px 0;
+            line-height: 1.1;
+        }
+
+        img {
+            max-height: 28px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scale-container">
+        <table>
+            <tr>
+                <td>
+                    <p><strong>Производитель:</strong> ООО «ДК «Мегатрейд-Юг»</p>
+                    <p><strong>Адрес мощностей производства:</strong> 296500 РФ, Республика Крым, г. Саки, ул.
+                        Евпаторийское шоссе, 49</p>
+                    <p>Тел/факс: 8(36563)23554</p>
+
+                    <p style="text-align:center"><strong>Изделие колбасное вареное</strong></p>
+                    <p style="text-align:center"><strong>{{name}}</strong></p>
+                    <p style="text-align:center"><strong>ТУ 10.13.14.-009-55509541-2017</strong></p>
+
+                    <p>Состав: говядина, ММО, мясо птицы (филе цыпленка-бройлера), крахмал, молоко сухое,
+                        нитрито-посолочная смесь, регулятор кислотности Е450ii, Е451, сахар, соль, антиокислитель Е316,
+                        усилитель вкуса и аромата Е621, Е631, Е627, пряности и их экстракты, животный белок, желирующие
+                        агенты Е407, Е508, регулятор кислотности Е262, Е333, Е330, антиокислитель Е300, мальтодекстрин,
+                        экстракт мускатного ореха, декстроза, краситель Е120</p>
+
+                    <p>Пищевая и энергетическая ценность в 100 г продукта: белок – 10,0 г, жир – 20,0 г, углеводы – 3,0
+                        г. Энергетическая ценность: 241 кКал, 10090 кДж</p>
+
+                    <p>Условия хранения: при температуре не выше +6°C — не более 15 суток (не фасованных), не более 30
+                        суток (в вакуумной упаковке)</p>
+
+                    <p><strong>Дата изготовления:</strong> {{date}}</p>
+                    <p>№ партии соответствует дате производства</p>
+                    <p><strong>Масса нетто:</strong> {{weight}} кг</p>
+
+                    <p>
+                        <img src="/assets/images/icon1.jpeg" alt="icon1" />
+                        <img src="/assets/images/icon2.png" alt="icon2" />
+                        <img src="/assets/images/icon3.jpeg" alt="icon3" />
+                        <img src="/assets/images/icon4.jpeg" alt="icon4" />
+                        <img src="/assets/images/icon5.jpeg" alt="temp limit" />
+                    </p>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
