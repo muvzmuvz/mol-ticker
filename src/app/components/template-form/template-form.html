@@ -1,0 +1,15 @@
+<div class="template-form">
+  <h2>Загрузка шаблона</h2>
+  <form>
+    <label for="name">Название продукта:</label>
+    <input id="name" [(ngModel)]="name" name="name" placeholder="Напр. Колбаса" />
+
+    <label for="image">Файл изображения (.jpg):</label>
+    <input id="image" type="file" accept=".jpg,.png" (change)="onImageSelected($event)" />
+
+    <label for="template">HTML-шаблон (.html):</label>
+    <input id="template" type="file" accept=".html" (change)="onHtmlSelected($event)" />
+
+    <button type="button" (click)="uploadTemplate()">Загрузить шаблон</button>
+  </form>
+</div>

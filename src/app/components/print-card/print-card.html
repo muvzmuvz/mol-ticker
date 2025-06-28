@@ -1,6 +1,6 @@
 <div class="main">
   <div class="card-items" *ngFor="let product of templates">
-    <img [src]="'http://localhost:3000/assets/' + product.image" alt="{{product.name}}" class="product-img">
+    <img [src]="'http://localhost:3000/assets/' + product.image" alt="{{product.name}}" class="product-img" />
     <h3>{{ product.name }}</h3>
     <button (click)="openModal(product)" class="print-button">Печать</button>
   </div>
@@ -9,10 +9,11 @@
 <div class="modal" *ngIf="isOpen">
   <div class="modal-content">
     <span class="close" (click)="closeModal()">&times;</span>
+
+    <!-- Передаём выбранный шаблон в компонент принтера -->
     <app-printer
-      class="modal-printer"
-      [templateName]="selectedProduct.templateName"
-      [name]="selectedProduct.name"
+      [templateName]="selectedProduct?.templateName"
+      [name]="selectedProduct?.name"
     ></app-printer>
   </div>
 </div>

@@ -1,13 +1,25 @@
 .main {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    width: 350px;
-    background: #f0f0f0;
+    flex-wrap: wrap;          /* Позволяет карточкам переходить на новую строку */
+    flex-direction: row;      /* Центрируем карточки по горизонтали */
+    gap: 20px;                /* Отступы между карточками */
+    width: 100%;              /* Ширина контейнера — на всю доступную */
+    max-width: 1200px;        /* Максимальная ширина */
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     font-family: 'Segoe UI', sans-serif;
+    height: auto;
+}
+
+.card-items {
+    flex: 0 0 300px;          /* Фиксированная ширина карточки */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    object-fit: fill;
+    padding: 30px 0;
+    background: white;        /* Добавил фон, чтобы отделить карточки */
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modal {
@@ -18,15 +30,6 @@
     top: 0;
     left: 0;
     z-index: 1000;
-}
-
-.card-items {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    object-fit: fill;
-    max-width: 300px;
-    padding: 30px 0;
 }
 
 .modal-content {
@@ -47,7 +50,6 @@
 
 .product-img {
     width: 100%;
-
     border-radius: 8px;
     margin-bottom: 1rem;
 }
@@ -66,7 +68,6 @@
     display: flex;
     width: 100%;
     height: 100%;
-    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;

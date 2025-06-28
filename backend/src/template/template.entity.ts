@@ -2,15 +2,15 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Template {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column()
-  name: string;          // отображаемое имя (Докторская)
+    @Column()
+    name: string;
 
-  @Column()
-  templateName: string;  // имя html-файла (docktorskaya)
+    @Column()
+    templateName: string;
 
-  @Column()
-  image: string;         // имя картинки (docktorskaya.jpg)
+    @Column()
+    image: string;
 }

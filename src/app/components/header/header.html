@@ -1,0 +1,10 @@
+<div class="header">
+    <div class="logo"><h2>Колбаса</h2></div>
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    (input)="onSearchChange()"
+    placeholder="Поиск по шаблонам..."
+    class="search-input"
+  />
+</div>
