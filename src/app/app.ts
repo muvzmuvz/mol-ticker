@@ -15,7 +15,7 @@ import { NgZone } from '@angular/core';
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrls: ['./app.less'],
-  imports: [RouterOutlet, FormsModule, HttpClientModule, PrinterComponent, CommonModule, PrintCard, HeaderComponent, TemplateFormComponent],
+  imports: [RouterOutlet, FormsModule, HttpClientModule, CommonModule, PrintCard, HeaderComponent, TemplateFormComponent],
 })
 export class App {
   protected title = 'mmol-ticket';

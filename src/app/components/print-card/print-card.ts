@@ -41,4 +41,17 @@ export class PrintCard {
   closeModal() {
     this.isOpen = false;
   }
+  deleteTemplate(id: number) {
+    if (!confirm('Удалить шаблон?')) return;
+
+    this.http.delete(`http://localhost:3000/templates/${id}`)
+      .subscribe(() => {
+        // Удалим шаблон из массива после успешного ответа
+        this.templates = this.templates.filter(t => t.id !== id);
+      }, error => {
+        console.error('Ошибка при удалении:', error);
+        alert('Не удалось удалить шаблон');
+      });
+  }
+
 }

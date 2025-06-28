@@ -1,3 +1,4 @@
+// src/template/template.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Template } from './template.entity';
@@ -16,5 +17,9 @@ export class TemplateService {
 
   create(data: Partial<Template>): Promise<Template> {
     return this.repo.save(data);
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.repo.delete(id);
   }
 }

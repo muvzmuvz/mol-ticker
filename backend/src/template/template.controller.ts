@@ -1,8 +1,11 @@
+// src/template/template.controller.ts
 import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
+  Param,
   UploadedFiles,
   UseInterceptors,
   BadRequestException,
@@ -25,6 +28,18 @@ export class TemplateController {
   @Post()
   create(@Body() data: Partial<Template>): Promise<Template> {
     return this.templateService.create(data);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<{ message: string }> {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Некорректный ID');
+    }
+
+    await this.templateService.remove(parsedId);
+
+    return { message: `Шаблон с ID ${parsedId} удалён` };
   }
 
   @Post('upload')
