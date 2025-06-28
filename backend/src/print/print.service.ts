@@ -5,8 +5,8 @@ import * as puppeteer from 'puppeteer';
 
 @Injectable()
 export class PrintService {
-  async generatePdfBuffer(data: any): Promise<Buffer> {
-    const templatePath = path.join(__dirname, '../../assets/template.html');
+  async generatePdfBuffer(data: any, templateName: string, copies: number): Promise<Buffer> {
+    const templatePath = path.join(__dirname, `../../assets/${templateName}.html`);
     let html = fs.readFileSync(templatePath, 'utf8');
 
     // Добавляем базовый URL для корректной загрузки ресурсов (картинок)
