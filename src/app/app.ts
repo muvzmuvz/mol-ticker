@@ -10,6 +10,7 @@ import { PrintCard } from './components/print-card/print-card';
 
 @Component({
   selector: 'app-root',
+  template: '<router-outlet></router-outlet><div class="main"><app-print-card></app-print-card></div>',
   imports: [RouterOutlet, FormsModule, HttpClientModule, PrinterComponent, CommonModule, PrintCard],
   templateUrl: './app.html',
   styleUrl: './app.less'

@@ -1,13 +1,18 @@
 <div class="main">
-    <div class="card-items">
-        <img [src]="'img/' + product.templateName + '.jpg'" alt="колбаса" class="product-img">
-        <h3> {{ product.name }}</h3>
-        <button (click)="openModal()" class="print-button">Печать</button>
-    </div>
+  <div class="card-items" *ngFor="let product of templates">
+    <img [src]="'http://localhost:3000/assets/' + product.image" alt="{{product.name}}" class="product-img">
+    <h3>{{ product.name }}</h3>
+    <button (click)="openModal(product)" class="print-button">Печать</button>
+  </div>
 </div>
+
 <div class="modal" *ngIf="isOpen">
-    <div class="modal-content">
-        <span class="close" (click)="closeModal()">&times;</span>
-        <app-printer class="modal-printer"></app-printer>
-    </div>
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <app-printer
+      class="modal-printer"
+      [templateName]="selectedProduct.templateName"
+      [name]="selectedProduct.name"
+    ></app-printer>
+  </div>
 </div>

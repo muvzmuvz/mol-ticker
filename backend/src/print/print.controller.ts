@@ -4,15 +4,15 @@ import { Response } from 'express';
 
 @Controller('print')
 export class PrintController {
-  constructor(private readonly printService: PrintService) {}
+  constructor(private svc: PrintService) {}
 
   @Post()
-  async print(@Body() body: { data: any; copies: number; templateName: string }, @Res() res: Response) {
-    const pdfBuffer = await this.printService.generatePdfBuffer(body.data, body.templateName, body.copies);
+  async print(@Body() b: { data: any; templateName: string; copies: number }, @Res() res: Response) {
+    const buf = await this.svc.generatePdfBuffer(b.data, b.templateName, b.copies);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename=label.pdf',
     });
-    res.send(pdfBuffer);
+    res.send(buf);
   }
 }

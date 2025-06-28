@@ -1,16 +1,6 @@
-<div class="main">
-
-
 <form class="label-form">
-    <label for="name">Название продукта:</label>
-    <input id="name" [(ngModel)]="product.name" name="name" placeholder="Введите название продукта" />
-
-    <label for="date">Дата производства:</label>
-    <input id="date" type="date" [(ngModel)]="product.date" name="date" />
-
-    <label for="weight">Вес (в кг):</label>
-    <input id="weight" type="number" [(ngModel)]="product.weight" name="weight" placeholder="0" min="0" step="0.01" />
-
+    <label>Название: <input [(ngModel)]="product.name" name="name"></label>
+    <label>Дата: <input type="date" [(ngModel)]="product.date" name="date"></label>
+    <label>Вес: <input type="number" [(ngModel)]="product.weight" name="weight" step="0.001"></label>
     <button type="button" (click)="print()">Печать</button>
 </form>
-</div>

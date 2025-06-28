@@ -1,54 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-printer',
   templateUrl: './printer.html',
-  styleUrl: './printer.less',
-  imports: [FormsModule]
+  styleUrls: ['./printer.less'],
+  imports: [FormsModule, CommonModule],
 })
-export class PrinterComponent {
-  product = {
-    templateName: 'kolbasa', // Название шаблона
-    name: '',
-    date: '',
-    weight: 0,
-  };
+export class PrinterComponent implements OnInit {
+  @Input() templateName = '';
+  @Input() name = '';
 
-  copies = 1; // Количество копий
+  product = { name: '', date: '', weight: 0 };
+  copies = 1;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.product.name = this.name;
+  }
 
   print() {
-    // Формируем тело запроса правильно
-    const requestBody = {
-      templateName: this.product.templateName,
+    const body = {
+      templateName: this.templateName,
       copies: this.copies,
       data: {
         name: this.product.name,
         date: this.product.date,
-        weight: this.product.weight.toFixed(3), // сохраняем 3 знака после запятой
-      }
+        weight: this.product.weight.toFixed(3),
+      },
     };
-
-    // Отправляем POST-запрос на сервер
-    this.http.post('http://localhost:3000/print', requestBody, { responseType: 'blob' })
-      .subscribe((pdfBlob) => {
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        const printWindow = window.open(blobUrl);
-
-        if (printWindow) {
-          printWindow.addEventListener('load', () => {
-            printWindow.print();
-          });
-        } else {
-          alert('Не удалось открыть окно для печати');
-        }
-      }, (error) => {
-        console.error('Ошибка при печати:', error);
-        alert('Ошибка при отправке запроса на печать');
+    this.http.post('http://localhost:3000/print', body, { responseType: 'blob' })
+      .subscribe(blob => {
+        const url = URL.createObjectURL(blob);
+        const w = window.open(url);
+        w?.addEventListener('load', () => w.print());
       });
   }
 }
