@@ -3,9 +3,10 @@ import { AuthService } from './auth.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, HttpClientModule],
+  imports: [FormsModule, HttpClientModule,],
   templateUrl: './auth.html',
   styleUrl: './auth.less'
 })

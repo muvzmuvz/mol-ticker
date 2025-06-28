@@ -49,12 +49,14 @@ export class Home {
     });
   }
 
-  loadUserRole() {
-    this.authService.getUserRole().subscribe(role => {
-      this.ngZone.run(() => {
-        this.userRole = role;
-        this.cd.detectChanges();  // Обновляем шаблон
-      });
+loadUserRole() {
+  this.authService.getUserRole().subscribe(role => {
+    this.ngZone.run(() => {
+      this.userRole = role;
+      setTimeout(() => this.cd.detectChanges());
+      // или: this.cd.markForCheck();
     });
-  }
+  });
+}
+
 }
