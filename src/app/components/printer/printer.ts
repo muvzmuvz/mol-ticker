@@ -11,30 +11,44 @@ import { FormsModule } from '@angular/forms';
 })
 export class PrinterComponent {
   product = {
+    templateName: 'kolbasa', // Название шаблона
     name: '',
     date: '',
     weight: 0,
   };
-  copies = 1;
+
+  copies = 1; // Количество копий
 
   constructor(private http: HttpClient) { }
 
   print() {
-    const data = {
-      name: this.product.name,
-      date: this.product.date,
-      weight: this.product.weight.toFixed(3), // ← сохраняем 3 знака после запятой в строку
+    // Формируем тело запроса правильно
+    const requestBody = {
+      templateName: this.product.templateName,
+      copies: this.copies,
+      data: {
+        name: this.product.name,
+        date: this.product.date,
+        weight: this.product.weight.toFixed(3), // сохраняем 3 знака после запятой
+      }
     };
 
-    this.http.post('http://localhost:3000/print', { data, copies: this.copies }, { responseType: 'blob' })
+    // Отправляем POST-запрос на сервер
+    this.http.post('http://localhost:3000/print', requestBody, { responseType: 'blob' })
       .subscribe((pdfBlob) => {
         const blobUrl = URL.createObjectURL(pdfBlob);
         const printWindow = window.open(blobUrl);
+
         if (printWindow) {
           printWindow.addEventListener('load', () => {
             printWindow.print();
           });
+        } else {
+          alert('Не удалось открыть окно для печати');
         }
+      }, (error) => {
+        console.error('Ошибка при печати:', error);
+        alert('Ошибка при отправке запроса на печать');
       });
   }
 }

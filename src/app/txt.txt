@@ -1,0 +1,287 @@
+📁 Проектная структура:
+
+label-printer/
+├── backend/          # NestJS сервер
+│   ├── assets/
+│   │   └── template.html     # HTML-шаблон этикетки
+│   ├── src/
+│   │   ├── print/
+│   │   │   ├── print.controller.ts
+│   │   │   └── print.service.ts
+│   │   ├── app.module.ts
+│   │   ├── main.ts
+│   ├── package.json
+├── frontend/         # Angular интерфейс
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── printer/
+│   │   │   │   ├── printer.ts
+│   │   │   │   └── printer.html    
+│   │   │   ├── printer-card/
+│   │   │   │   ├── printer-card.ts
+│   │   │   │   └── printer-card.html  
+│   │   │   └── app.module.ts
+│   ├── package.json
+
+==============================
+
+📦 backend/src/print/print.service.ts:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as puppeteer from 'puppeteer';
+
+@Injectable()
+export class PrintService {
+  async generatePdfBuffer(data: any, templateName: string, copies: number): Promise<Buffer> {
+    const templatePath = path.join(__dirname, `../../assets/${templateName}.html`);
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    // Добавляем базовый URL для корректной загрузки ресурсов (картинок)
+    html = html.replace('<head>', `<head><base href="http://localhost:3000/">`);
+
+    // Подставляем данные в шаблон
+    html = html.replace(/{{name}}/g, data.name)
+               .replace(/{{date}}/g, data.date)
+               .replace(/{{weight}}/g, data.weight);
+
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+
+    // Размер окна для генерации PDF (настрой по своему шаблону)
+    await page.setViewport({ width: 375, height: 189 });
+
+    // Загружаем HTML с ожиданием полной загрузки ресурсов
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Генерируем PDF с нужными размерами и без полей
+    const pdfBuffer = await page.pdf({
+      width: '98mm',
+      height: '80mm',
+      margin: { top: '0mm', bottom: '0mm', left: '0mm', right: '0mm' },
+      printBackground: true,
+    });
+
+    await browser.close();
+    return Buffer.from(pdfBuffer);
+  }
+}
+
+```
+
+📦 backend/src/print/print.controller.ts:
+
+```ts
+import { Controller, Post, Body, Res } from '@nestjs/common';
+import { PrintService } from './print.service';
+import { Response } from 'express';
+
+@Controller('print')
+export class PrintController {
+  constructor(private readonly printService: PrintService) {}
+
+  @Post()
+  async print(@Body() body: { data: any; copies: number; templateName: string }, @Res() res: Response) {
+    const pdfBuffer = await this.printService.generatePdfBuffer(body.data, body.templateName, body.copies);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename=label.pdf',
+    });
+    res.send(pdfBuffer);
+  }
+}
+```
+
+📦 backend/src/app.module.ts:
+
+```ts
+import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
+import { PrintController } from './print/print.controller';
+import { PrintService } from './print/print.service';
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../assets'),  // путь к папке с картинками и шаблонами
+      serveRoot: '/assets',                       // URL, по которому будут доступны файлы
+    }),
+  ],
+  controllers: [PrintController],
+  providers: [PrintService],
+})
+export class AppModule { }
+
+```
+
+==============================
+
+📦 frontend/src/app/printer/printer.ts:
+
+import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-printer',
+  templateUrl: './printer.html',
+  styleUrl: './printer.less',
+  imports: [FormsModule]
+})
+export class PrinterComponent {
+  product = {
+    templateName: 'kolbasa', // Название шаблона
+    name: '',
+    date: '',
+    weight: 0,
+  };
+
+  copies = 1; // Количество копий
+
+  constructor(private http: HttpClient) { }
+
+  print() {
+    // Формируем тело запроса правильно
+    const requestBody = {
+      templateName: this.product.templateName,
+      copies: this.copies,
+      data: {
+        name: this.product.name,
+        date: this.product.date,
+        weight: this.product.weight.toFixed(3), // сохраняем 3 знака после запятой
+      }
+    };
+
+    // Отправляем POST-запрос на сервер
+    this.http.post('http://localhost:3000/print', requestBody, { responseType: 'blob' })
+      .subscribe((pdfBlob) => {
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        const printWindow = window.open(blobUrl);
+
+        if (printWindow) {
+          printWindow.addEventListener('load', () => {
+            printWindow.print();
+          });
+        } else {
+          alert('Не удалось открыть окно для печати');
+        }
+      }, (error) => {
+        console.error('Ошибка при печати:', error);
+        alert('Ошибка при отправке запроса на печать');
+      });
+  }
+}
+
+```
+
+📦 frontend/src/app/printer/printer.html:
+
+```html
+<div class="main">
+
+
+<form class="label-form">
+    <label for="name">Название продукта:</label>
+    <input id="name" [(ngModel)]="product.name" name="name" placeholder="Введите название продукта" />
+
+    <label for="date">Дата производства:</label>
+    <input id="date" type="date" [(ngModel)]="product.date" name="date" />
+
+    <label for="weight">Вес (в кг):</label>
+    <input id="weight" type="number" [(ngModel)]="product.weight" name="weight" placeholder="0" min="0" step="0.01" />
+
+    <button type="button" (click)="print()">Печать</button>
+</form>
+</div>
+```
+
+📦 frontend/src/app/app.ts:
+
+```ts
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { PrinterComponent } from './components/printer/printer';
+import { CommonModule } from '@angular/common';
+import { PrintCard } from './components/print-card/print-card';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, FormsModule, HttpClientModule, PrinterComponent, CommonModule, PrintCard],
+  templateUrl: './app.html',
+  styleUrl: './app.less'
+})
+export class App {
+  protected title = 'mmol-ticket';
+}
+
+```
+📦 frontend/src/app/app.html:
+<router-outlet></router-outlet>
+<div class="main">
+  <app-print-card></app-print-card>
+</div>
+
+📦 frontend/src/app/printer-card/printer-card.html:
+<div class="main">
+    <div class="card-items">
+        <img [src]="'img/' + product.templateName + '.jpg'" alt="колбаса" class="product-img">
+        <h3> {{ product.name }}</h3>
+        <button (click)="openModal()" class="print-button">Печать</button>
+    </div>
+</div>
+<div class="modal" *ngIf="isOpen">
+    <div class="modal-content">
+        <span class="close" (click)="closeModal()">&times;</span>
+        <app-printer class="modal-printer"></app-printer>
+    </div>
+</div>
+
+
+
+📦 frontend/src/app/printer-card/printer-card.ts:
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { PrinterComponent } from '../printer/printer';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-print-card',
+  imports: [FormsModule, PrinterComponent, CommonModule],
+  templateUrl: './print-card.html',
+  styleUrl: './print-card.less'
+})
+export class PrintCard {
+  product = {
+    templateName: 'docktorskaya', // Название шаблона
+    name: 'Доктораская колбаса',
+    date: '',
+    weight: 0,
+  };
+
+  isOpen = false; // Флаг для отслеживания состояния модального окна
+  openModal() {
+    this.isOpen = true;
+  }
+
+  closeModal() {
+    this.isOpen = false;
+  }
+}
+
+
+==============================
+
+📦 backend/assets/template.html:
+
+(см. ранее подготовленный HTML с переменными `{{name}}`, `{{date}}`, `{{weight}}`).
