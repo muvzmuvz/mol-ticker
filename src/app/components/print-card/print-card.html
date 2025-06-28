@@ -3,8 +3,8 @@
     <img [src]="'http://localhost:3000/assets/' + product.image" alt="{{product.name}}" class="product-img" />
     <h3>{{ product.name }}</h3>
     
-    <button (click)="openModal(product)" class="print-button">Печать</button>
-    <button (click)="deleteTemplate(product.id)" class="delete-button">Удалить</button>
+    <button (click)="openModal(product)" class="print-button" >Печать</button>
+    <button (click)="deleteTemplate(product.id)" class="delete-button" *ngIf="userRole === 'admin'">Удалить</button>
   </div>
 </div>
 

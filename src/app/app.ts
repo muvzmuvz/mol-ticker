@@ -9,13 +9,17 @@ import { HeaderComponent } from './components/header/header';
 import { TemplateFormComponent } from './components/template-form/template-form';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
+import { AuthService } from './components/auth/auth.service';
+import { NgIf } from '@angular/common';
 
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrls: ['./app.less'],
-  imports: [RouterOutlet, FormsModule, HttpClientModule, CommonModule, PrintCard, HeaderComponent, TemplateFormComponent],
+  imports: [RouterOutlet, FormsModule, HttpClientModule, CommonModule, PrintCard, HeaderComponent, TemplateFormComponent, NgIf],
+  providers: [AuthService],
+  standalone: true
 })
 export class App {
   protected title = 'mmol-ticket';

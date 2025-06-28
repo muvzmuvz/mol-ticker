@@ -31,20 +31,32 @@ export class TemplateFormComponent {
       this.htmlFile = input.files[0];
     }
   }
-
   uploadTemplate() {
     if (!this.name || !this.imageFile || !this.htmlFile) {
       alert('Заполните все поля и выберите файлы');
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Вы не авторизованы');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', this.name);
     formData.append('image', this.imageFile);
-    formData.append('html', this.htmlFile);  // <-- здесь "html", а не "template"
+    formData.append('html', this.htmlFile);  // <-- "html", как ты указал
 
-    this.http.post('http://localhost:3000/templates/upload', formData).subscribe({
-      next: () => alert('Шаблон успешно загружен!'),
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+
+    this.http.post('http://localhost:3000/templates/upload', formData, { headers }).subscribe({
+      next: () => {
+        alert('Шаблон успешно загружен!');
+        window.location.reload();
+      },
       error: (err) => {
         console.error('Ошибка загрузки:', err);
         alert('Произошла ошибка при загрузке');

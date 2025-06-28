@@ -1,0 +1,17 @@
+<app-header></app-header>
+
+<div class="button-container" *ngIf="userRole === 'admin'">
+  <button (click)="openForm()" class="form-button">Добавить шаблон</button>
+</div>
+
+<div class="main">
+  <!-- Подписываемся на событие templatesLoaded -->
+  <app-print-card></app-print-card>
+</div>
+
+<div class="modal" *ngIf="isOpen">
+  <div class="modal-content">
+    <span class="close" (click)="closeForm()">&times;</span>
+    <app-template-form></app-template-form>
+  </div>
+</div>
