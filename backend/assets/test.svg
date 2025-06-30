@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="98mm" height="80mm">
+  <style>
+    text {
+      font-size: 7pt;
+      font-family: sans-serif;
+    }
+    .bold { font-weight: bold; }
+    .italic { font-style: italic; }
+    .center { text-anchor: middle; }
+    .small-img {
+      width: 24px;
+      height: 24px;
+    }
+  </style>
+
+  <!-- Фон -->
+  <rect width="100%" height="100%" fill="white" />
+
+  <!-- Текст -->
+  <text x="4mm" y="10mm"><tspan class="bold">Производитель:</tspan> ИП ЦЫГАНКОВ Д.В.</text>
+  <text x="4mm" y="14mm">по заказу ООО «ДК «Мегатрейд-Юг»</text>
+  <text x="4mm" y="18mm"><tspan class="bold">Адрес мощностей производства:</tspan> 296500 РФ, Республика Крым, г. Саки, ул. Евпаторийское шоссе, 49</text>
+  <text x="4mm" y="22mm">Тел/факс: 8(36563)23554</text>
+
+  <text x="49mm" y="28mm" class="center bold">Изделие колбасное вареное</text>
+  <text x="49mm" y="32mm" class="center bold">{{name}}</text>
+  <text x="49mm" y="36mm" class="center bold">ТУ 10.13.14.-009-55509541-2017</text>
+
+  <text x="4mm" y="42mm">Состав: свинина, говядина, шпик, вода, регуляторы кислотности (Е450, Е451), сахар...</text>
+  <text x="4mm" y="46mm">Пищевая ценность в 100 г: белок – 10,0 г, жир – 30,0 г, углеводы – 3,1 г, 322 кКал</text>
+  <text x="4mm" y="50mm">Условия хранения: +6°C — не более 15 суток (не фас.), 30 суток (в вакууме)</text>
+  <text x="4mm" y="54mm">После вскрытия – не более 3-х суток</text>
+  <text x="4mm" y="58mm" class="italic">Содержит аллерген: молочные продукты</text>
+
+  <text x="4mm" y="62mm"><tspan class="bold">Дата изготовления:</tspan> {{date}}</text>
+  <text x="4mm" y="66mm">№ партии соответствует дате производства</text>
+  <text x="4mm" y="70mm"><tspan class="bold">Масса нетто:</tspan> {{weight}} кг</text>
+
+  <!-- Иконки -->
+  <image href="http://localhost:3000/assets/images/icon1.jpeg" x="4mm" y="72mm" width="8mm" height="8mm"/>
+  <image href="http://localhost:3000/assets/images/icon2.png"  x="14mm" y="72mm" width="8mm" height="8mm"/>
+  <image href="http://localhost:3000/assets/images/icon3.jpeg" x="24mm" y="72mm" width="8mm" height="8mm"/>
+  <image href="http://localhost:3000/assets/images/icon4.jpeg" x="34mm" y="72mm" width="8mm" height="8mm"/>
+  <image href="http://localhost:3000/assets/images/icon5.jpeg" x="44mm" y="72mm" width="8mm" height="8mm"/>
+</svg>

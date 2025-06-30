@@ -10,7 +10,7 @@ export class AuthService {
     constructor(private http: HttpClient, private router: Router) { }
 
     login(username: string, password: string) {
-        return this.http.post<{ access_token: string }>('http://localhost:3000/auth/login', {
+        return this.http.post<{ access_token: string }>('http://192.168.0.174:3000/auth/login', {
             username,
             password,
         });

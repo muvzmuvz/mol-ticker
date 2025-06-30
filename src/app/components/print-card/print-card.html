@@ -1,20 +1,66 @@
 <div class="main">
   <div class="card-items" *ngFor="let product of templates">
-    <img [src]="'http://localhost:3000/assets/' + product.image" alt="{{product.name}}" class="product-img" />
-    <h3>{{ product.name }}</h3>
-    
-    <button (click)="openModal(product)" class="print-button" >Печать</button>
-    <button (click)="deleteTemplate(product.id)" class="delete-button" *ngIf="userRole === 'admin'">Удалить</button>
+    <img [src]="'http://192.168.0.174:3000/assets/' + product.image" alt="{{product.name}}" class="product-img" />
+    <h3 class="product-name">{{ product.name }}</h3>
+    <div class="buttons">
+      <button (click)="openModal(product)" class="print-button">Печать</button>
+      <button (click)="deleteTemplate(product.id)" class="delete-button" *ngIf="userRole === 'admin'">Удалить</button>
+      <button (click)="openModal(product); enableEdit()" class="print-button" *ngIf="userRole === 'admin'">
+        Редактировать
+      </button>
+    </div>
   </div>
 </div>
 
+<!-- Модальное окно -->
 <div class="modal" *ngIf="isOpen">
   <div class="modal-content">
     <span class="close" (click)="closeModal()">&times;</span>
 
-    <app-printer
-      [templateName]="selectedProduct?.templateName"
-      [name]="selectedProduct?.name"
-    ></app-printer>
+    <!-- Форма редактирования -->
+    <div *ngIf="editMode && selectedProduct">
+      <h3>Редактирование шаблона</h3>
+
+      <label>
+        Название:
+        <input type="text" [(ngModel)]="editName" />
+      </label>
+      <br />
+
+      <label>
+        Новый HTML:
+        <input type="file" (change)="onFileChange('html', $event)" />
+      </label>
+      <br />
+
+      <label>
+        Или выбрать из существующих:
+        <select [(ngModel)]="selectedHtmlName">
+          <option value="">-- не выбрано --</option>
+          <option *ngFor="let file of availableHtmlFiles" [value]="file">
+            {{ file }}
+          </option>
+        </select>
+      </label>
+      <br />
+
+      <small *ngIf="editHtml">
+        Загружен новый файл: <strong>{{ editHtml.name }}</strong> (он заменит выбор из списка)
+      </small>
+      <br /><br />
+
+      <label>
+        Новое изображение:
+        <input type="file" (change)="onFileChange('image', $event)" />
+      </label>
+      <br /><br />
+
+      <button (click)="saveChanges()">Сохранить</button>
+      <button (click)="editMode = false">Отмена</button>
+    </div>
+
+    <!-- Просмотр + печать -->
+    <app-printer *ngIf="!editMode" [templateName]="selectedProduct?.templateName"
+      [name]="selectedProduct?.name"></app-printer>
   </div>
 </div>

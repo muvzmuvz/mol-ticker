@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
@@ -9,50 +10,38 @@ import {
   UseInterceptors,
   BadRequestException,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { Template } from './template.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-
-// 🔐 Импорты для защиты по ролям
+import * as fs from 'fs';
+// 🔐 Защита по ролям
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator'; // Декоратор для ролей
+import { Roles } from '../auth/roles.decorator';
+
 @Controller('templates')
 export class TemplateController {
-  constructor(private readonly templateService: TemplateService) {}
+  constructor(private readonly templateService: TemplateService) { }
 
-  // 👁 Открытый доступ для всех (в том числе гостей)
+  // 👁 Получить список всех шаблонов (доступно всем)
   @Get()
   getAll(): Promise<Template[]> {
     return this.templateService.findAll();
   }
 
-  // 🔐 Только админ может создавать шаблоны
-  @Post()
+  // 🔐 Создание шаблона (только для админа)
+  @Post('create')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   create(@Body() data: Partial<Template>): Promise<Template> {
     return this.templateService.create(data);
   }
 
-  // 🔐 Только админ может удалять
-  @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
-  async delete(@Param('id') id: string): Promise<{ message: string }> {
-    const parsedId = parseInt(id, 10);
-    if (isNaN(parsedId)) {
-      throw new BadRequestException('Некорректный ID');
-    }
-
-    await this.templateService.remove(parsedId);
-    return { message: `Шаблон с ID ${parsedId} удалён` };
-  }
-
-  // 🔐 Только админ может загружать файлы
+  // 🔐 Загрузка файлов (HTML и изображение)
   @Post('upload')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
@@ -96,5 +85,85 @@ export class TemplateController {
     };
 
     return this.templateService.create(newTemplate);
+  }
+
+  // 🔐 Редактирование шаблона
+  @Patch(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'html', maxCount: 1 },
+        { name: 'image', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './assets',
+          filename: (req, file, cb) => {
+            const filename = path.basename(file.originalname);
+            cb(null, filename);
+          },
+        }),
+      },
+    ),
+  )
+  async editTemplate(
+    @Param('id') id: string,
+    @UploadedFiles() files: {
+      html?: Express.Multer.File[];
+      image?: Express.Multer.File[];
+    },
+    @Body('name') name: string,
+  ): Promise<Template> {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Некорректный ID');
+    }
+
+    // Проверим, существует ли шаблон
+    const existing = await this.templateService.findById(parsedId);
+    if (!existing) {
+      throw new NotFoundException(`Шаблон с ID ${parsedId} не найден`);
+    }
+
+    const updateData: Partial<Template> = {};
+    if (name) updateData.name = name;
+
+    if (files.html?.[0]) {
+      updateData.templateName = path.parse(files.html[0].originalname).name;
+    }
+
+    if (files.image?.[0]) {
+      updateData.image = files.image[0].originalname;
+    }
+
+    return this.templateService.update(parsedId, updateData);
+  }
+
+  // 🔐 Удаление шаблона
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  async delete(@Param('id') id: string): Promise<{ message: string }> {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Некорректный ID');
+    }
+
+    // Проверим, существует ли шаблон
+    const existing = await this.templateService.findById(parsedId);
+    if (!existing) {
+      throw new NotFoundException(`Шаблон с ID ${parsedId} не найден`);
+    }
+
+    await this.templateService.remove(parsedId);
+    return { message: `Шаблон с ID ${parsedId} удалён` };
+  }
+  @Get('files')
+  getAvailableHtmlFiles(): string[] {
+    const dir = './assets';
+    const files = fs.readdirSync(dir);
+    return files.filter(file => file.endsWith('.html'));
   }
 }

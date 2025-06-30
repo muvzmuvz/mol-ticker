@@ -21,7 +21,7 @@ export class RoleService {
       });
 
       return this.http
-        .get<{ role: string }>('http://localhost:3000/auth/role', {
+        .get<{ role: string }>('http://192.168.0.174:3000/auth/role', {
           headers,
         })
         .pipe(map(res => res.role));

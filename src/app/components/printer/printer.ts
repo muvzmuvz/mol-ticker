@@ -14,7 +14,7 @@ export class PrinterComponent implements OnInit {
   @Input() templateName = '';
   @Input() name = '';
 
-  product = { name: '', date: '', weight: 0 };
+  product = { name: '', date: '', weight: 0.450 };
   copies = 1;
 
   constructor(private http: HttpClient) {}
@@ -33,7 +33,7 @@ export class PrinterComponent implements OnInit {
         weight: this.product.weight.toFixed(3),
       },
     };
-    this.http.post('http://localhost:3000/print', body, { responseType: 'blob' })
+    this.http.post('http://192.168.0.174:3000/print', body, { responseType: 'blob' })
       .subscribe(blob => {
         const url = URL.createObjectURL(blob);
         const w = window.open(url);

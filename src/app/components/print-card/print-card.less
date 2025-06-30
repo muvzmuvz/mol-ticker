@@ -1,25 +1,40 @@
 .main {
     display: flex;
-    flex-wrap: wrap;          /* Позволяет карточкам переходить на новую строку */
-    flex-direction: row;      /* Центрируем карточки по горизонтали */
-    gap: 20px;                /* Отступы между карточками */
-    width: 100%;              /* Ширина контейнера — на всю доступную */
-    max-width: 1200px;        /* Максимальная ширина */
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    margin: 0 auto;
     border-radius: 12px;
     font-family: 'Segoe UI', sans-serif;
-    height: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    max-height: 100px;
+}
+
+.product-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 10px 0;
 }
 
 .card-items {
-    flex: 0 0 300px;          /* Фиксированная ширина карточки */
+    flex: 0 1 calc(33.333% - 20px); // 3 карточки в ряд
     display: flex;
     flex-direction: column;
+    max-width: 250px;
     align-items: center;
-    object-fit: fill;
-    padding: 30px 0;
-    background: white;        /* Добавил фон, чтобы отделить карточки */
+    text-align: center;
+    padding: 20px 10px;
+    background: white;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
 }
 
 .modal {
@@ -37,7 +52,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 1001;
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
@@ -46,12 +61,14 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 .product-img {
-    width: 100%;
+    max-width: 200px;
     border-radius: 8px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.2rem;
+    max-height: 150px;
 }
 
 .close {
@@ -97,7 +114,6 @@
 
 .delete-button {
     width: 75%;
-    margin-top: 10px;
     padding: 0.75rem;
     background-color: #e53935;
     color: #fff;
@@ -115,4 +131,56 @@
     &:active {
         transform: scale(0.98);
     }
+}
+
+/* Планшеты (768px и ниже) */
+@media (max-width: 768px) {
+    .card-items {
+        flex: 0 1 calc(50% - 20px); // 2 карточки в ряд
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90vh;
+        padding: 1rem;
+    }
+}
+
+/* Мобильные (480px и ниже) */
+@media (max-width: 480px) {
+    .card-items {
+        flex: 0 1 100%; // 1 карточка в ряд
+        padding: 20px;
+    }
+
+    .main {
+        padding: 0.5rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        max-height: 90vh;
+        padding: 0.75rem;
+    }
+
+    .print-button,
+    .delete-button {
+        width: 100%;
+        font-size: 0.95rem;
+        padding: 0.6rem;
+    }
+
+    .close {
+        font-size: 1.25rem;
+        top: 8px;
+        right: 10px;
+    }
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
 }

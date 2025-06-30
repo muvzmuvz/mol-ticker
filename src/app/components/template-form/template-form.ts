@@ -52,7 +52,7 @@ export class TemplateFormComponent {
       Authorization: `Bearer ${token}`
     };
 
-    this.http.post('http://localhost:3000/templates/upload', formData, { headers }).subscribe({
+    this.http.post('http://192.168.0.174:3000/templates/upload', formData, { headers }).subscribe({
       next: () => {
         alert('Шаблон успешно загружен!');
         window.location.reload();

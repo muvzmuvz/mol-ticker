@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root' // Делает сервис доступным глобально
 })
 export class TemplateService {
-  private apiUrl = 'http://localhost:3000/templates';
+  private apiUrl = 'http://192.168.0.174:3000/templates';
 
   constructor(private http: HttpClient) { }
 

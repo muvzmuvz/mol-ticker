@@ -17,40 +17,113 @@ import { HttpHeaders } from '@angular/common/http';
   styleUrl: './print-card.less',
 })
 export class PrintCard {
-  templates: any[] = [];          // Все шаблоны из базы
-  selectedProduct: any = null;    // Текущий шаблон, выбранный для печати
+  templates: any[] = [];
+  selectedProduct: any = null;
   isOpen = false;
+  editMode = false;
+  editName = '';
+  editHtml: File | null = null;
+  selectedHtmlName: string = ''; // выбранный шаблон из списка
+  availableHtmlFiles: string[] = []; // все доступные html-шаблоны
+  editImage: File | null = null;
   userRole: string | null = null;
 
-  constructor(private http: HttpClient, private cd: ChangeDetectorRef, private authService: RoleService, private ngZone: NgZone) {
+  constructor(
+    private http: HttpClient,
+    private cd: ChangeDetectorRef,
+    private authService: RoleService,
+    private ngZone: NgZone
+  ) {
     this.loadUserRole();
   }
 
   ngOnInit() {
-    this.http.get<any[]>('http://localhost:3000/templates')
-      .subscribe(data => {
-        console.log('templates:', data);
-        this.templates = data;
-        this.cd.detectChanges();
-      });
+    this.http.get<any[]>('http://192.168.0.174:3000/templates').subscribe(data => {
+      this.templates = data;
+      this.cd.detectChanges();
+    });
+
+    this.http.get<string[]>('http://192.168.0.174:3000/templates/files').subscribe(files => {
+      this.availableHtmlFiles = files;
+    });
   }
+
   loadUserRole() {
     this.authService.getUserRole().subscribe(role => {
       this.ngZone.run(() => {
         this.userRole = role;
-        this.cd.detectChanges();  // Обновляем шаблон
+        this.cd.detectChanges();
       });
     });
   }
 
   openModal(template: any) {
-    this.selectedProduct = template; // Просто сохраняем весь объект
+    this.selectedProduct = template;
     this.isOpen = true;
+    this.editMode = false;
+    this.editName = template.name;
+    this.selectedHtmlName = template.templateName + '.html'; // подставляем текущий
   }
 
   closeModal() {
     this.isOpen = false;
+    this.editMode = false;
+    this.editHtml = null;
+    this.editImage = null;
+    this.selectedHtmlName = '';
   }
+
+  enableEdit() {
+    this.editMode = true;
+    this.editName = this.selectedProduct.name;
+  }
+
+  onFileChange(type: 'html' | 'image', event: any) {
+    const file = event.target.files[0];
+    if (type === 'html') this.editHtml = file;
+    if (type === 'image') this.editImage = file;
+  }
+
+  saveChanges() {
+    if (!this.selectedProduct) return;
+
+    const formData = new FormData();
+    formData.append('name', this.editName);
+
+    if (this.editHtml) {
+      formData.append('html', this.editHtml); // Приоритет загрузке
+    } else if (this.selectedHtmlName) {
+      formData.append('templateName', this.selectedHtmlName.replace('.html', ''));
+    }
+
+    if (this.editImage) {
+      formData.append('image', this.editImage);
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Вы не авторизованы');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http
+      .patch(`http://192.168.0.174:3000/templates/${this.selectedProduct.id}`, formData, { headers })
+      .subscribe(
+        () => {
+          alert('Шаблон обновлён!');
+          window.location.reload();
+        },
+        error => {
+          console.error('Ошибка при обновлении:', error);
+          alert('Ошибка при обновлении');
+        }
+      );
+  }
+
   deleteTemplate(id: number) {
     if (!confirm('Удалить шаблон?')) return;
 
@@ -64,14 +137,14 @@ export class PrintCard {
       Authorization: `Bearer ${token}`,
     });
 
-    this.http.delete(`http://localhost:3000/templates/${id}`, { headers })
-      .subscribe(() => {
-        window.location.reload();  // Перезагрузка всей страницы
-      }, error => {
+    this.http.delete(`http://192.168.0.174:3000/templates/${id}`, { headers }).subscribe(
+      () => {
+        window.location.reload();
+      },
+      error => {
         console.error('Ошибка при удалении:', error);
         alert('Не удалось удалить шаблон');
-      });
+      }
+    );
   }
-
-
 }
