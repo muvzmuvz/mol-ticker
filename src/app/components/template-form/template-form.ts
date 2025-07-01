@@ -15,6 +15,7 @@ export class TemplateFormComponent {
   name = '';
   imageFile: File | null = null;
   htmlFile: File | null = null;
+  ean13 = ''; // Добавляем поле для EAN-13, если нужно
 
   constructor(private http: HttpClient) { }
 
@@ -46,7 +47,8 @@ export class TemplateFormComponent {
     const formData = new FormData();
     formData.append('name', this.name);
     formData.append('image', this.imageFile);
-    formData.append('html', this.htmlFile);  // <-- "html", как ты указал
+    formData.append('html', this.htmlFile); 
+    formData.append('ean13', this.ean13) // <-- "html", как ты указал
 
     const headers = {
       Authorization: `Bearer ${token}`

@@ -14,7 +14,7 @@ export class PrinterComponent implements OnInit {
   @Input() templateName = '';
   @Input() name = '';
 
-  product = { name: '', date: '', weight: 0.450 };
+  product = { name: '', date: '', weight: 0.450, };
   copies = 1;
 
   constructor(private http: HttpClient) {}

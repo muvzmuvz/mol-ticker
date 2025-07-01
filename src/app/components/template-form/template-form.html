@@ -9,6 +9,8 @@
 
     <label for="template">HTML-шаблон (.html):</label>
     <input id="template" type="file" accept=".html" (change)="onHtmlSelected($event)" />
+        <label for="ean13">Штрих код</label>
+    <input id="ean13" [(ngModel)]="ean13" name="ean13" placeholder="Напр. 1234567890123" />
 
     <button type="button" (click)="uploadTemplate()">Загрузить шаблон</button>
   </form>

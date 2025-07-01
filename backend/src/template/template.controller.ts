@@ -38,10 +38,13 @@ export class TemplateController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   create(@Body() data: Partial<Template>): Promise<Template> {
+    if (data.ean13 && !/^\d{13}$/.test(data.ean13)) {
+      throw new BadRequestException('ean13 должен содержать 13 цифр');
+    }
     return this.templateService.create(data);
   }
 
-  // 🔐 Загрузка файлов (HTML и изображение)
+  // 🔐 Загрузка файлов (HTML и изображение) + EAN-13
   @Post('upload')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
@@ -69,19 +72,25 @@ export class TemplateController {
       image?: Express.Multer.File[];
     },
     @Body('name') name: string,
+    @Body('ean13') ean13: string,
   ): Promise<Template> {
     if (!files.html || !files.image) {
       throw new BadRequestException('Оба файла (html и image) обязательны.');
+    }
+
+    if (ean13 && !/^\d{13}$/.test(ean13)) {
+      throw new BadRequestException('ean13 должен содержать 13 цифр');
     }
 
     const htmlFile = files.html[0];
     const imageFile = files.image[0];
     const templateName = path.parse(htmlFile.originalname).name;
 
-    const newTemplate = {
+    const newTemplate: Partial<Template> = {
       name,
       templateName,
       image: imageFile.originalname,
+      ean13,
     };
 
     return this.templateService.create(newTemplate);
@@ -115,13 +124,13 @@ export class TemplateController {
       image?: Express.Multer.File[];
     },
     @Body('name') name: string,
+    @Body('ean13') ean13: string,
   ): Promise<Template> {
     const parsedId = parseInt(id, 10);
     if (isNaN(parsedId)) {
       throw new BadRequestException('Некорректный ID');
     }
 
-    // Проверим, существует ли шаблон
     const existing = await this.templateService.findById(parsedId);
     if (!existing) {
       throw new NotFoundException(`Шаблон с ID ${parsedId} не найден`);
@@ -129,13 +138,17 @@ export class TemplateController {
 
     const updateData: Partial<Template> = {};
     if (name) updateData.name = name;
-
     if (files.html?.[0]) {
       updateData.templateName = path.parse(files.html[0].originalname).name;
     }
-
     if (files.image?.[0]) {
       updateData.image = files.image[0].originalname;
+    }
+    if (ean13) {
+      if (!/^\d{13}$/.test(ean13)) {
+        throw new BadRequestException('ean13 должен содержать 13 цифр');
+      }
+      updateData.ean13 = ean13;
     }
 
     return this.templateService.update(parsedId, updateData);
@@ -151,7 +164,6 @@ export class TemplateController {
       throw new BadRequestException('Некорректный ID');
     }
 
-    // Проверим, существует ли шаблон
     const existing = await this.templateService.findById(parsedId);
     if (!existing) {
       throw new NotFoundException(`Шаблон с ID ${parsedId} не найден`);
@@ -160,6 +172,7 @@ export class TemplateController {
     await this.templateService.remove(parsedId);
     return { message: `Шаблон с ID ${parsedId} удалён` };
   }
+
   @Get('files')
   getAvailableHtmlFiles(): string[] {
     const dir = './assets';

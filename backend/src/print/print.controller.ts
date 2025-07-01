@@ -7,8 +7,8 @@ export class PrintController {
   constructor(private svc: PrintService) {}
 
   @Post()
-  async print(@Body() b: { data: any; templateName: string; copies: number }, @Res() res: Response) {
-    const buf = await this.svc.generatePdfBuffer(b.data, b.templateName, b.copies);
+  async print(@Body() b: { data: any; templateName: string; copies: number,}, @Res() res: Response) {
+    const buf = await this.svc.generatePdfBuffer(b.data, b.templateName);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename=label.pdf',

@@ -8,6 +8,7 @@ import { PrintController } from './print/print.controller';
 import { PrintService } from './print/print.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/user.entity';   
+import { PrintModule } from './print/print.module';
 
 @Module({
   imports: [
@@ -23,8 +24,8 @@ import { User } from './users/user.entity';
     }),
     TemplateModule,
     AuthModule,
+    PrintModule
   ],
-  controllers: [PrintController],
-  providers: [PrintService],
+
 })
 export class AppModule {}
