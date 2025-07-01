@@ -25,13 +25,17 @@
         Название:
         <input type="text" [(ngModel)]="editName" />
       </label>
-      <br />
+
+      <label>
+        Штрих-код:
+        <input type="text" [(ngModel)]="editEan13" />
+      </label>
 
       <label>
         Новый HTML:
         <input type="file" (change)="onFileChange('html', $event)" />
       </label>
-      <br />
+
 
       <label>
         Или выбрать из существующих:
@@ -42,18 +46,18 @@
           </option>
         </select>
       </label>
-      <br />
+
 
       <small *ngIf="editHtml">
         Загружен новый файл: <strong>{{ editHtml.name }}</strong> (он заменит выбор из списка)
       </small>
-      <br /><br />
+
 
       <label>
         Новое изображение:
         <input type="file" (change)="onFileChange('image', $event)" />
       </label>
-      <br /><br />
+
 
       <button (click)="saveChanges()">Сохранить</button>
       <button (click)="editMode = false">Отмена</button>

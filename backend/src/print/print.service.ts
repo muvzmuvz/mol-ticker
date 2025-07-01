@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
-import * as bwipjs from 'bwip-js'; // 📦 генератор штрих-кодов
+import * as bwipjs from 'bwip-js';
 import { Template } from 'src/template/template.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,9 +12,8 @@ export class PrintService {
   constructor(
     @InjectRepository(Template)
     private templateRepo: Repository<Template>,
-  ) { }
+  ) {}
 
-  // Функция генерации изображения штрих-кода в base64
   private async generateBarcodeBase64(ean13: string): Promise<string> {
     try {
       const png = await bwipjs.toBuffer({
@@ -25,7 +24,6 @@ export class PrintService {
         includetext: true,
         textxalign: 'center',
       });
-
       return `data:image/png;base64,${png.toString('base64')}`;
     } catch (err) {
       console.error('Ошибка генерации штрих-кода:', err);
@@ -33,41 +31,40 @@ export class PrintService {
     }
   }
 
-  async generatePdfBuffer(data: any, templateName: string): Promise<Buffer> {
-    const templatePath = path.join(__dirname, `../../assets/${templateName}.html`);
+  async generatePdfBuffer(
+    data: any,
+    templateName?: string,
+    templateId?: number,
+  ): Promise<Buffer> {
+    let template: Template | null = null;
 
-    // Загружаем HTML-шаблон
+    if (templateId !== undefined) {
+      template = await this.templateRepo.findOneBy({ id: templateId });
+    } else if (templateName) {
+      template = await this.templateRepo.findOneBy({ templateName });
+    }
+
+    if (!template) {
+      throw new Error('Шаблон не найден по id или имени');
+    }
+
+    const templatePath = path.join(__dirname, `../../assets/${template.templateName}.html`);
+
     let html = fs.readFileSync(templatePath, 'utf8')
       .replace('<head>', `<head><base href="http://localhost:3000/">`)
       .replace(/{{name}}/g, data.name || '')
       .replace(/{{date}}/g, data.date || '')
       .replace(/{{weight}}/g, data.weight || '');
 
-    // Получаем ean13: сначала из запроса, потом из шаблона в базе
-    let ean13 = data.ean13;
+    let ean13 = data.ean13 || template.ean13;
 
-    if (!ean13) {
-      const template = await this.templateRepo.findOneBy({ templateName });
-      if (template?.ean13) {
-        ean13 = template.ean13;
-        console.log(`ean13 найден в БД: ${ean13}`);
-      } else {
-        console.warn('ean13 не найден ни в запросе, ни в базе');
-      }
-    }
-
-    // Проверка и генерация штрих-кода
     let barcode = '';
-
     if (ean13 && /^\d{13}$/.test(ean13)) {
       barcode = await this.generateBarcodeBase64(ean13);
     } else {
       console.warn('ean13 отсутствует или некорректен');
-      console.log('Данные запроса:', data);
     }
-    console.log('Проверка: есть ли barcode в HTML?', barcode.slice(0, 30)); // покажет начало строки
-    console.log('HTML с barcode:', html.includes(barcode)); // true / false
-    // Вставка изображения штрихкода в шаблон
+
     html = html.replace(/{{barcode}}/g, barcode);
 
     const browser = await puppeteer.launch({ headless: true });

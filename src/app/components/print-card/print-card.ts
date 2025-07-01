@@ -22,6 +22,7 @@ export class PrintCard {
   isOpen = false;
   editMode = false;
   editName = '';
+  editEan13 =''
   editHtml: File | null = null;
   selectedHtmlName: string = ''; // выбранный шаблон из списка
   availableHtmlFiles: string[] = []; // все доступные html-шаблоны
@@ -62,6 +63,7 @@ export class PrintCard {
     this.isOpen = true;
     this.editMode = false;
     this.editName = template.name;
+    this.editEan13 = template.ean13;
     this.selectedHtmlName = template.templateName + '.html'; // подставляем текущий
   }
 
@@ -89,6 +91,7 @@ export class PrintCard {
 
     const formData = new FormData();
     formData.append('name', this.editName);
+    formData.append('ean13',this.editEan13 );
 
     if (this.editHtml) {
       formData.append('html', this.editHtml); // Приоритет загрузке

@@ -184,3 +184,102 @@
     gap: 10px;
     width: 100%;
 }
+
+.modal-content form, /* если будет форма */
+.modal-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Метки */
+.modal-content label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #222;
+}
+
+/* Текстовые поля и селекты */
+.modal-content input[type="text"],
+.modal-content select {
+  padding: 8px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  outline-offset: 2px;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content select:focus {
+  border-color: #007acc;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+}
+
+/* Файловый инпут */
+.modal-content input[type="file"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s ease;
+}
+
+.modal-content input[type="file"]:hover {
+  border-color: #007acc;
+}
+
+/* Кнопки формы */
+.modal-content button {
+  cursor: pointer;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+}
+
+.modal-content button:hover {
+  transform: scale(1.03);
+}
+
+/* Кнопка сохранить - синий */
+.modal-content button:first-of-type {
+  background-color: #007acc;
+  color: white;
+}
+
+.modal-content button:first-of-type:hover {
+  background-color: #005ea3;
+}
+
+/* Кнопка отмены - серый */
+.modal-content button:last-of-type {
+  background-color: #ccc;
+  color: #333;
+}
+
+.modal-content button:last-of-type:hover {
+  background-color: #aaa;
+}
+
+/* Мелкий текст под загрузкой файла */
+.modal-content small {
+  font-size: 12px;
+  color: #666;
+  margin-left: 8px;
+}
+
+/* Отступы для <br> внутри формы лучше заменить на gap, но для сохранения структуры добавим снизу */
+.modal-content br {
+  content: "";
+  display: block;
+  margin-bottom: 0.5rem;
+}
